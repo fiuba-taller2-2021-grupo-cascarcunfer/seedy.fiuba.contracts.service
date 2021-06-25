@@ -71,12 +71,6 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   networks: {
-    localhost: {
-      accounts: {
-        mnemonic,
-      },
-      chainId: chainIds.hardhat,
-    },
     hardhat: {
       accounts: {
         mnemonic,

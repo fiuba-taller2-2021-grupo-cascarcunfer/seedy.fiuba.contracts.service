@@ -6,4 +6,5 @@ COPY package*.json ./
 # ENV NODE_ENV production
 RUN yarn install
 COPY . .
+RUN yarn compile
 CMD yarn start
