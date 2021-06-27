@@ -2,7 +2,7 @@ const ethers = require("ethers");
 const accounts = [];
 
 const getDeployerWallet = ({ config }) => () => {
-  const provider = config.networkdProvider();
+  const provider = config.networkProvider();
   return ethers.Wallet.fromMnemonic(config.deployerMnemonic).connect(provider);
 };
 
@@ -26,14 +26,25 @@ const getWalletsData = () => () => {
   return accounts;
 };
 
-const getWalletData = () => index => {
-  return accounts[index - 1];
+const getWalletData = ({ config }) => async index => {
+  const systemWallet = ethers.Wallet.fromMnemonic(config.deployerMnemonic);
+  const provider = config.networkProvider();
+  const wallet = new ethers.Wallet(accounts[index - 1].privateKey, provider);
+
+  console.log("systemwallet", (await provider.getBalance(systemWallet.address)).toString());
+  const tx = { to: wallet.address, value: 10 };
+  await systemWallet.signTransaction(tx);
+  const systemWalletConnected = systemWallet.connect(provider);
+  await systemWalletConnected.sendTransaction(tx);
+
+  const balance = (await provider.getBalance(wallet.address)).toString();
+  return { wallet, balance };
 };
 
 const getWallet = ({ config }) => index => {
   const provider = config.networkProvider();
-
-  return new ethers.Wallet(accounts[index - 1].privateKey, provider);
+  const wallet = new ethers.Wallet(accounts[index - 1].privateKey, provider);
+  return wallet;
 };
 
 module.exports = ({ config }) => ({

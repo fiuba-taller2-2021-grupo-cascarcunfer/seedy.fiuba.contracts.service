@@ -3,6 +3,7 @@ const getWalletsData = require("./handlers/getWalletsHandler");
 const createWallet = require("./handlers/createWalletHandler");
 const createProject = require("./handlers/createProjectHandler");
 const getProject = require("./handlers/getProjectHandler");
+const sponsorProject = require("./handlers/sponsorProjectHandler");
 
 function getWalletDataRoute({ services, config }) {
   return {
@@ -40,6 +41,15 @@ function createProjectRoute({ services, config }) {
   };
 }
 
+function sponsorProjectRoute({ services, config }) {
+  return {
+    method: "POST",
+    url: "/project/:id/funds",
+    schema: sponsorProject.schema(config),
+    handler: sponsorProject.handler({ config, ...services }),
+  };
+}
+
 function getProjectRoute({ services, config }) {
   return {
     method: "GET",
@@ -49,4 +59,11 @@ function getProjectRoute({ services, config }) {
   };
 }
 
-module.exports = [getWalletDataRoute, getWalletsDataRoute, createWalletRoute, createProjectRoute, getProjectRoute];
+module.exports = [
+  getWalletDataRoute,
+  getWalletsDataRoute,
+  createWalletRoute,
+  createProjectRoute,
+  getProjectRoute,
+  sponsorProjectRoute,
+];

@@ -2,7 +2,8 @@ const BigNumber = require("bignumber.js");
 const ethers = require("ethers");
 
 const getContract = (config, wallet) => {
-  return new ethers.Contract(config.contractAddress, config.contractAbi, wallet);
+  const result = new ethers.Contract(config.contractAddress, config.contractAbi, wallet);
+  return result;
 };
 
 const toWei = number => {
@@ -45,7 +46,9 @@ const getProject = () => async id => {
   return projects[id];
 };
 
+const fundProject = () => async (projectId, sponsorWallet, amount) => {};
 module.exports = dependencies => ({
   createProject: createProject(dependencies),
   getProject: getProject(dependencies),
+  fundProject: fundProject(dependencies),
 });
