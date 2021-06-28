@@ -1,4 +1,5 @@
 const ethers = require("ethers");
+const { toWei } = require("../services/helpers");
 const accounts = [];
 
 const getDeployerWallet = ({ config }) => () => {
@@ -46,7 +47,11 @@ const fundWallet = ({ config }) => async (walletId, amount) => {
   const from = ethers.Wallet.fromMnemonic(config.deployerMnemonic).connect(provider);
   const to = new ethers.Wallet(accounts[walletId].privateKey, provider);
 
-  const tx = { to: to.address, value: amount };
+  const tx = {
+    to: to.address,
+    value: toWei(amount),
+  };
+
   await from.signTransaction(tx);
   await from.sendTransaction(tx);
 

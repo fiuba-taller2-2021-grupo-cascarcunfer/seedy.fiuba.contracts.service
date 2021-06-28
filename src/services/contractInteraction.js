@@ -1,10 +1,5 @@
-const BigNumber = require("bignumber.js");
 const ethers = require("ethers");
-
-const toWei = number => {
-  const WEIS_IN_ETHER = BigNumber(10).pow(18);
-  return BigNumber(number).times(WEIS_IN_ETHER).toFixed();
-};
+const { toWei } = require("../services/helpers");
 
 const projects = {};
 
@@ -19,8 +14,8 @@ const createProject = ({ config }) => async (deployerWallet, stagesCost, ownerWa
     const project = {
       projectId,
       stagesCost,
-      ownerWallet: ownerWallet.address,
-      reviewerWallet: reviewerWallet.address,
+      ownerWallet: ownerWallet,
+      reviewerWallet: reviewerWallet,
       hash: tx.hash,
     };
     projects[projectId] = project;
@@ -30,22 +25,27 @@ const createProject = ({ config }) => async (deployerWallet, stagesCost, ownerWa
   }
 };
 
-const getProject = () => async id => {
+const getProject = ({ config }) => async id => {
+  const provider = config.networkProvider();
+  const seedyfiuba = new ethers.Contract(config.contractAddress, config.contractAbi, provider);
+
   console.log(`Getting project ${id}: ${projects[id]}`);
+  console.log("projects", await seedyfiuba.projects(id));
   return projects[id];
 };
 
 const fundProject = ({ config }) => async (projectId, sponsorWallet, amount) => {
   const provider = config.networkProvider();
   const seedyfiuba = new ethers.Contract(config.contractAddress, config.contractAbi, sponsorWallet);
-  const tx = await seedyfiuba.fund(projectId, { value: amount });
+  const tx = await seedyfiuba.fund(projectId, { value: toWei(amount) });
   const receipt = await tx.wait(1);
   const firstEvent = receipt && receipt.events && receipt.events[0];
   return firstEvent;
 };
 
-const withdrawProject = ({ config }) => async (projectId, ownerWallet, stageIndex) => {
+const withdrawProject = ({ config, walletService }) => async (projectId, stageIndex) => {
   const provider = config.networkProvider();
+  const ownerWallet = walletService.getWallet(projects[projectId].ownerWallet.privateKey, provider);
   const seedyfiuba = new ethers.Contract(config.contractAddress, config.contractAbi, ownerWallet);
   const tx = await seedyfiuba.withdraw(projectId, stateIndex);
   const receipt = await tx.wait(1);

@@ -3,18 +3,19 @@ function schema() {
     params: {
       type: "object",
       properties: {
-        amount: {
+        stage: {
           type: "integer",
         },
       },
     },
-    required: ["amount"],
+    required: ["stage"],
   };
 }
 
 function handler({ contractInteraction, walletService }) {
   return async function (req, reply) {
-    reply.code(403).send("NotImplemented");
+    const result = await contractInteraction.withdraw(req.params.id, req.params.stage);
+    reply.code(200).send(result);
   };
 }
 
