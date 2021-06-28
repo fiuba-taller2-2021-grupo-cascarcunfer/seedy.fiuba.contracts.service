@@ -3,6 +3,18 @@ const getWalletsData = require("./handlers/getWalletsHandler");
 const createWallet = require("./handlers/createWalletHandler");
 const createProject = require("./handlers/createProjectHandler");
 const getProject = require("./handlers/getProjectHandler");
+const fundWallet = require("./handlers/fundWalletHandler");
+const fundProject = require("./handlers/fundProjectHandler");
+const withdrawProject = require("./handlers/withdrawProjectHandler");
+
+function getWalletsDataRoute({ services, config }) {
+  return {
+    method: "GET",
+    url: "/wallet",
+    schema: getWalletsData.schema(config),
+    handler: getWalletsData.handler({ config, ...services }),
+  };
+}
 
 function getWalletDataRoute({ services, config }) {
   return {
@@ -13,12 +25,12 @@ function getWalletDataRoute({ services, config }) {
   };
 }
 
-function getWalletsDataRoute({ services, config }) {
+function fundWalletDataRoute({ services, config }) {
   return {
-    method: "GET",
-    url: "/wallet",
-    schema: getWalletsData.schema(config),
-    handler: getWalletsData.handler({ config, ...services }),
+    method: "POST",
+    url: "/wallet/:id/funds",
+    schema: fundWallet.schema(config),
+    handler: fundWallet.handler({ config, ...services }),
   };
 }
 
@@ -49,4 +61,31 @@ function getProjectRoute({ services, config }) {
   };
 }
 
-module.exports = [getWalletDataRoute, getWalletsDataRoute, createWalletRoute, createProjectRoute, getProjectRoute];
+function fundProjectRoute({ services, config }) {
+  return {
+    method: "POST",
+    url: "/project/:id/funds",
+    schema: fundProject.schema(config),
+    handler: fundProject.handler({ config, ...services }),
+  };
+}
+
+function withdrawProjectRoute({ services, config }) {
+  return {
+    method: "POST",
+    url: "/project/:id/withdraw",
+    schema: withdrawProject.schema(config),
+    handler: withdrawProject.handler({ config, ...services }),
+  };
+}
+
+module.exports = [
+  getWalletsDataRoute,
+  getWalletDataRoute,
+  createWalletRoute,
+  createProjectRoute,
+  getProjectRoute,
+  fundWalletDataRoute,
+  fundProjectRoute,
+  withdrawProjectRoute,
+];

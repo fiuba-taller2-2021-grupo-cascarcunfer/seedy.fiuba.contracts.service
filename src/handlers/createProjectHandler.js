@@ -22,11 +22,11 @@ function schema() {
 
 function handler({ contractInteraction, walletService }) {
   return async function (req) {
-    return contractInteraction.createProject(
+    return await contractInteraction.createProject(
       walletService.getDeployerWallet(),
       req.body.stagesCost,
-      walletService.getWalletData(req.body.ownerId).address,
-      walletService.getWalletData(req.body.reviewerId).address,
+      walletService.getWallet(req.body.ownerId),
+      walletService.getWallet(req.body.reviewerId),
     );
   };
 }
