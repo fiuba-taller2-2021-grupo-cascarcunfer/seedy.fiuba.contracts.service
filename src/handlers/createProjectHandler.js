@@ -1,13 +1,13 @@
 function schema() {
   return {
-    params: {
+    body: {
       type: "object",
       properties: {
         ownerId: {
-          type: "integer",
+          type: "string",
         },
         reviewerId: {
-          type: "integer",
+          type: "string",
         },
         stagesCost: {
           type: "array",
@@ -25,8 +25,8 @@ function handler({ contractInteraction, walletService }) {
     return await contractInteraction.createProject(
       walletService.getDeployerWallet(),
       req.body.stagesCost,
-      walletService.getWallet(req.body.ownerId),
-      walletService.getWallet(req.body.reviewerId),
+      await walletService.getWallet(req.body.ownerId),
+      await walletService.getWallet(req.body.reviewerId),
     );
   };
 }

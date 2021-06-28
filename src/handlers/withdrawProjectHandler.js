@@ -3,6 +3,12 @@ function schema() {
     params: {
       type: "object",
       properties: {
+        id: { type: "string" },
+      },
+    },
+    body: {
+      type: "object",
+      properties: {
         stage: {
           type: "integer",
         },

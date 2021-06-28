@@ -1,6 +1,6 @@
 const ethers = require("ethers");
+const { Wallet } = require("../mongodb");
 const { toWei } = require("../services/helpers");
-const accounts = [];
 
 const getDeployerWallet = ({ config }) => () => {
   const provider = config.networkProvider();
@@ -10,24 +10,24 @@ const getDeployerWallet = ({ config }) => () => {
 const createWallet = ({ config }) => async () => {
   const provider = config.networkProvider();
   const wallet = ethers.Wallet.createRandom().connect(provider);
-  const result = {
-    id: accounts.length,
-    address: wallet.address,
-    privateKey: wallet.privateKey,
-  };
-  accounts.push(result);
-  return result;
+  return (
+    await new Wallet({
+      address: wallet.address,
+      privateKey: wallet.privateKey,
+    }).save()
+  ).asObj();
 };
 
-const getWalletsData = () => () => {
-  return accounts;
+const getWalletsData = () => async () => {
+  return (await Wallet.find({})).map(item => item.asObj());
 };
 
-const getWalletData = ({ config }) => async index => {
+const getWalletData = ({ config }) => async id => {
+  const account = await Wallet.getById(id);
   const provider = config.networkProvider();
-  const wallet = new ethers.Wallet(accounts[index].privateKey, provider);
+  const wallet = new ethers.Wallet(account.privateKey, provider);
   const balance = (await provider.getBalance(wallet.address)).toString();
-  return { ...accounts[index], balance };
+  return { ...account.asObj(), balance };
 };
 
 const transfer = async ({ from, to, amount }) => {
@@ -36,16 +36,18 @@ const transfer = async ({ from, to, amount }) => {
   await from.sendTransaction(tx);
 };
 
-const getWallet = ({ config }) => index => {
+const getWallet = ({ config }) => async index => {
+  const account = await Wallet.getById(index);
   const provider = config.networkProvider();
-  const wallet = new ethers.Wallet(accounts[index].privateKey, provider);
+  const wallet = new ethers.Wallet(account.privateKey, provider);
   return wallet;
 };
 
 const fundWallet = ({ config }) => async (walletId, amount) => {
+  const account = await Wallet.getById(walletId);
   const provider = config.networkProvider();
   const from = ethers.Wallet.fromMnemonic(config.deployerMnemonic).connect(provider);
-  const to = new ethers.Wallet(accounts[walletId].privateKey, provider);
+  const to = new ethers.Wallet(account.privateKey, provider);
 
   const tx = {
     to: to.address,
@@ -56,7 +58,7 @@ const fundWallet = ({ config }) => async (walletId, amount) => {
   await from.sendTransaction(tx);
 
   const balance = (await provider.getBalance(to.address)).toString();
-  return { ...accounts[walletId], balance };
+  return { ...account.asObj(), balance };
 };
 
 module.exports = ({ config }) => ({

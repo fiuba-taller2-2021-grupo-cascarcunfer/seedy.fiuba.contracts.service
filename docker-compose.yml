@@ -1,0 +1,44 @@
+version: "3"
+services:
+  mongo:
+    image: mongo
+    container_name: "mongo"
+    ports:
+      - 27017:27017
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "9002:8081"
+    depends_on:
+      - mongo
+
+  ether:
+    image: seedy.fiuba.contracts
+    build:
+      context: .
+    environment:
+      - MNEMONIC=test test test test test test test test test test test junk
+      - INFURA_API_KEY=b0000000000000000000000000000000
+    ports:
+      - "8086:8545"
+    entrypoint: "yarn hardhat node"
+
+  contracts:
+    image: seedy.fiuba.contracts
+    build:
+      context: .
+    environment:
+      - NETWORK_URL=http://ether:8545
+      - NETWORK=hardhat
+      - MNEMONIC=test test test test test test test test test test test junk
+      - INFURA_API_KEY=b0000000000000000000000000000000
+      - PORT=80
+      - MONGODB_URI=mongodb://mongo/contracts
+    ports:
+      - "8087:80"
+    depends_on:
+      - ether
+    volumes:
+      - ./src:/opt/app/src
+    entrypoint: 'sh -c "yarn deploy-local && yarn nodemon"'
