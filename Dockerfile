@@ -1,7 +1,7 @@
 FROM node:12-buster-slim
 # Setup Datadog
 RUN apt-get update \
- && apt-get install -y gnupg apt-transport-https gpg-agent curl ca-certificates
+ && apt-get install -y git gnupg apt-transport-https gpg-agent curl ca-certificates
 ENV DATADOG_APT_KEYRING="/usr/share/keyrings/datadog-archive-keyring.gpg"
 ENV DATADOG_APT_KEYS_URL="https://keys.datadoghq.com"
 RUN sh -c "echo 'deb [signed-by=${DATADOG_APT_KEYRING}] https://apt.datadoghq.com/ stable 7' > /etc/apt/sources.list.d/datadog.list"
@@ -21,5 +21,4 @@ WORKDIR /opt/app
 COPY package*.json ./
 RUN yarn install 
 COPY . .
-RUN yarn compile
 CMD ./entrypoint.sh
