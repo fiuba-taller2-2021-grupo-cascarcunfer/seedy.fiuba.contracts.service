@@ -3,6 +3,12 @@ function schema() {
     params: {
       type: "object",
       properties: {
+        id: { type: "string" },
+      },
+    },
+    body: {
+      type: "object",
+      properties: {
         amount: {
           type: "integer",
         },
@@ -14,10 +20,9 @@ function schema() {
 
 function handler({ contractInteraction, walletService }) {
   return async function (req, reply) {
-    const sponsorWallet = walletService.getWallet(req.body.sponsorId);
+    const sponsorWallet = await walletService.getWallet(req.body.sponsorId);
     const amount = parseInt(req.body.amount);
     const result = await contractInteraction.fundProject(req.params.id, sponsorWallet, amount);
-
     reply.code(200).send(result);
   };
 }
