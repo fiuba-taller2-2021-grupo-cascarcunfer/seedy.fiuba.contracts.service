@@ -1,2 +1,14 @@
+hostname: contracts
+
 apm_config:
   apm_non_local_traffic: true
+
+listeners:
+  - name: docker
+config_providers:
+  - name: docker
+    polling: true
+    poll_interval: 1s
+process_config:
+    enabled: 'true'
+
