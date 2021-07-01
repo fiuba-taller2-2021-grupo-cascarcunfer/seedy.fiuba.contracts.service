@@ -1,0 +1,2 @@
+apm_config:
+  apm_non_local_traffic: true
