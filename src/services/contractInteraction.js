@@ -45,10 +45,10 @@ const fundProject = ({ config }) => async (projectId, sponsorWallet, amount) => 
 
 const withdrawProject = ({ config, walletService }) => async (projectId, stageIndex) => {
   const project = await Project.getById(projectId);
-  const ownerWallet = await Project.getById(project.ownerWalletId);
+  const account = await Project.getById(project.ownerWalletId);
 
   const provider = config.networkProvider();
-  const ownerWallet = walletService.getWallet(ownerWallet.privateKey, provider);
+  const ownerWallet = walletService.getWallet(account.privateKey, provider);
   const seedyfiuba = new ethers.Contract(config.contractAddress, config.contractAbi, ownerWallet);
   const tx = await seedyfiuba.withdraw(projectId, stateIndex);
   const receipt = await tx.wait(1);
