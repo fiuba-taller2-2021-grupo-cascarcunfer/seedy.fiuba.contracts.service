@@ -21,4 +21,5 @@ WORKDIR /opt/app
 COPY package*.json ./
 RUN yarn install 
 COPY . .
-CMD ./entrypoint.sh
+
+CMD ./entrypoint.sh $PORT
