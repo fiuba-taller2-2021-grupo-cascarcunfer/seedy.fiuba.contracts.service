@@ -14,6 +14,7 @@ RUN curl -o /tmp/DATADOG_APT_KEY_382E94DE.public "${DATADOG_APT_KEYS_URL}/DATADO
     gpg --ignore-time-conflict --no-default-keyring --keyring ${DATADOG_APT_KEYRING} --import /tmp/DATADOG_APT_KEY_382E94DE.public
 RUN apt-get update && apt-get -y --force-yes install --reinstall datadog-agent
 EXPOSE 8125/udp 8126/tcp
+ENV DD_APM_ENABLED=true
 COPY datadog-config/ /etc/datadog-agent/
 
 # Setup app

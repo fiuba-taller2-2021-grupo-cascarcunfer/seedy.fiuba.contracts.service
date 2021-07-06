@@ -1,8 +1,4 @@
 hostname: contracts
-
-apm_config:
-  apm_non_local_traffic: true
-
 listeners:
   - name: docker
 config_providers:
